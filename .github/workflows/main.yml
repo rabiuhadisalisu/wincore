@@ -1,8 +1,8 @@
-name: Billdoxer
+name: windows
 
 on:
   workflow_dispatch:
-
+  
 jobs:
   build:
     runs-on: windows-latest
@@ -26,8 +26,11 @@ jobs:
         Invoke-WebRequest -Uri https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip -OutFile ngrok.zip
         Expand-Archive -Path ngrok.zip -DestinationPath .
 
+        # Set ngrok authentication token
+        Set-Content -Path ngrok-auth.txt -Value '2Hd7yeF4INCKbg2aP9rGMLnDqBX_5K7WhATjW8eUxS6UoHSRa'
+
         # Authenticate ngrok
-        "D:\a\rabytebuild\myserver\ngrok\ngrok.exe" authtoken 2Hd7yeF4INCKbg2aP9rGMLnDqBX_5K7WhATjW8eUxS6UoHSRa
+        Start-Process -FilePath "D:\a\rabytebuild\myserver\ngrok\ngrok.exe" -ArgumentList "authtoken $(Get-Content ngrok-auth.txt)" -Wait
 
         # Enable Terminal Services on Windows
         Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
