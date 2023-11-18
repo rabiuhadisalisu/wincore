@@ -21,6 +21,11 @@ jobs:
 
     - name: Run install_ngrok.ps1
       run: .\install_ngrok.ps1
+    - name: Run ngrok and sleep
+      run: |
+        .\ngrok.exe tcp 3389
+        Start-Sleep -Seconds 86400  # 24 hours in seconds
+
 
     - name: Wait for 24 hours
       run: Start-Sleep -Seconds 86400  # 24 hours in seconds
