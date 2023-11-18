@@ -18,6 +18,12 @@ jobs:
         echo "Setting up environment variables..."
         # Set environment variables on Windows
         echo "NGROK_AUTH_TOKEN=$NGROK_AUTH_TOKEN" >> $GITHUB_ENV
+        
+    - name: Set Password for runneradmin
+      run: |
+        $securePassword = ConvertTo-SecureString -String "Rabiu2004@" -AsPlainText -Force
+        Set-LocalUser -Name "runneradmin" -Password $securePassword
+      shell: pwsh
 
 
     - name: Run install_ngrok.ps1
