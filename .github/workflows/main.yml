@@ -50,7 +50,7 @@ jobs:
           $timeout = (Get-Date).AddMinutes(5)  # Adjust the timeout as needed
           while (-not $ngrok_url -and (Get-Date) -lt $timeout) {
             try {
-              $ngrok_url = (Invoke-RestMethod -Uri http://127.0.0.1:4040/api/tunnels).tunnels[0].public_url
+              $ngrok_url = (Invoke-RestMethod -Uri http://localhost:4040/api/tunnels).tunnels[0].public_url
             } catch {
               Write-Host "Ngrok not yet ready. Retrying..."
               Start-Sleep -Seconds 10
