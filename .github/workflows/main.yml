@@ -47,3 +47,9 @@ jobs:
     - name: Create Tunnel
 
       run: .\ngrok\ngrok.exe tcp 3389
+      
+    - name: Wait for 24 hours
+      run: sleep 86400  # 24 hours in seconds
+      
+    - name: Ending Session
+      run: echo "MacOs End MF"
