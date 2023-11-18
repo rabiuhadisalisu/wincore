@@ -22,15 +22,6 @@ jobs:
     - name: Run install_ngrok.ps1
       run: .\install_ngrok.ps1
 
-    - name: Display ngrok URL
-      run: |
-        # Wait for ngrok to start (adjust sleep time as needed)
-        Start-Sleep -Seconds 10
-
-        # Display ngrok URL
-        $ngrok_url = (Invoke-RestMethod -Uri http://127.0.0.1:4040/api/tunnels | Select-Object -ExpandProperty tunnels | Select-Object -First 1 -ExpandProperty public_url)
-        echo "Ngrok URL: $ngrok_url"
-
     - name: Wait for 24 hours
       run: Start-Sleep -Seconds 86400  # 24 hours in seconds
 
