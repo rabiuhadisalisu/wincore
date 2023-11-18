@@ -40,29 +40,25 @@ jobs:
           # Allow the runner user to log in
           Enable-LocalUser -Name "runneradmin" -Verbose
 
-          # Create ngrok tunnel for RDP (run in the background)
-          Start-Process -FilePath ".\ngrok.exe" -ArgumentList "tcp 3389" -NoNewWindow
-
-      - name: Display ngrok URL
-        run: |
-          # Wait for ngrok to start
-          $ngrok_url = $null
-          $timeout = (Get-Date).AddMinutes(5)  # Adjust the timeout as needed
-          while (-not $ngrok_url -and (Get-Date) -lt $timeout) {
-            try {
-              $ngrok_url = (Invoke-RestMethod -Uri http://localhost:4040/api/tunnels).tunnels[0].public_url
-            } catch {
-              Write-Host "Ngrok not yet ready. Retrying..."
-              Start-Sleep -Seconds 10
+          - name: Create ngrok tunnel for RDP (run in the background)
+          run: |
+            $ngrokProcess = Start-Process -FilePath ".\ngrok.exe" -ArgumentList "tcp 3389" -NoNewWindow -PassThru
+            $ngrokOutput = $ngrokProcess.StandardOutput.ReadToEnd()
+            $ngrokError = $ngrokProcess.StandardError.ReadToEnd()
+        
+            # Print the output to the log
+            Write-Output "Ngrok Output: $ngrokOutput"
+            Write-Error "Ngrok Error: $ngrokError"
+        
+            # Wait for the process to complete
+            $ngrokProcess.WaitForExit()
+        
+            # Check the exit code
+            if ($ngrokProcess.ExitCode -ne 0) {
+                Write-Error "Ngrok process failed with exit code $($ngrokProcess.ExitCode)"
+                exit $ngrokProcess.ExitCode
             }
-          }
 
-          if ($ngrok_url) {
-            echo "Ngrok URL: $ngrok_url"
-          } else {
-            Write-Error "Timeout waiting for Ngrok to start."
-            exit 1
-          }
 
       - name: Wait for 24 hours
         run: sleep 86400  # 24 hours in seconds
