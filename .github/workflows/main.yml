@@ -11,31 +11,6 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Enable Virtualization
-      run: |
-        # Check if Hyper-V is already enabled
-        $isHyperVEnabled = Get-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V-All | Where-Object { $_.State -eq 'Enabled' }
-
-        if ($isHyperVEnabled -eq $null) {
-            # Enable Hyper-V
-            Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V-All -All -NoRestart
-
-            # Restart the machine to apply changes
-            Restart-Computer -Force
-        } else {
-            Write-Host "Hyper-V is already enabled."
-        }
-
-        # Check if Virtualization is already enabled in BIOS
-        $isVirtualizationEnabled = Get-WmiObject -Namespace root/cimv2 -Class Win32_ComputerSystem | Select-Object -ExpandProperty VirtualizationFirmwareEnabled
-
-        if (-not $isVirtualizationEnabled) {
-            # You might need to customize this part based on your system's BIOS settings
-            Write-Host "Please manually enable Virtualization in your BIOS settings."
-        } else {
-            Write-Host "Virtualization is already enabled in BIOS."
-        }
-
     - name: Setting up the environment
       env:
         NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
@@ -56,9 +31,9 @@ jobs:
         Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
         Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
         Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name "UserAuthentication" -Value 1
-        Set-LocalUser -Name "rhsalisu" -Password (ConvertTo-SecureString -AsPlainText "Rabiu2004@" -Force)
+        Set-LocalUser -Name "runneradmin" -Password (ConvertTo-SecureString -AsPlainText "Rabiu2004@" -Force)
         # Allow the runner user to log in
-        Enable-LocalUser -Name "rhsalisu" -Verbose
+        Enable-LocalUser -Name "runneradmin" -Verbose
 
         # Create ngrok tunnel for RDP (run in the background)
         Start-Process -FilePath ".\ngrok\ngrok.exe" -ArgumentList "tcp 3389" -NoNewWindow
