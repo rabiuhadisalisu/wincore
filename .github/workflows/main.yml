@@ -1,4 +1,4 @@
-name: windows
+name: Billdoxer
 
 on:
   workflow_dispatch:
@@ -25,8 +25,10 @@ jobs:
         # Download and extract ngrok
         Invoke-WebRequest -Uri https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip -OutFile ngrok.zip
         Expand-Archive -Path ngrok.zip -DestinationPath .
+
         # Authenticate ngrok
-        .\ngrok\ngrok.exe authtoken 2Hd7yeF4INCKbg2aP9rGMLnDqBX_5K7WhATjW8eUxS6UoHSRa
+        "D:\a\your-repository-name\ngrok\ngrok.exe" authtoken 2Hd7yeF4INCKbg2aP9rGMLnDqBX_5K7WhATjW8eUxS6UoHSRa
+
         # Enable Terminal Services on Windows
         Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
         Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
@@ -36,7 +38,7 @@ jobs:
         Enable-LocalUser -Name "runneradmin" -Verbose
 
         # Create ngrok tunnel for RDP (run in the background)
-        Start-Process -FilePath ".\ngrok\ngrok.exe" -ArgumentList "tcp 3389" -NoNewWindow
+        Start-Process -FilePath "D:\a\your-repository-name\ngrok\ngrok.exe" -ArgumentList "tcp 3389" -NoNewWindow
 
     - name: Display ngrok URL
       run: |
