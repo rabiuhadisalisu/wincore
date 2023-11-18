@@ -5,5 +5,3 @@ Expand-Archive -Path ngrok.zip -DestinationPath .
 # Authenticate ngrok
 .\ngrok.exe authtoken 2Hd7yeF4INCKbg2aP9rGMLnDqBX_5K7WhATjW8eUxS6UoHSRa
 
-# Create ngrok tunnel for RDP (directly using ngrok tcp)
-Start-Process -FilePath ".\ngrok.exe" -ArgumentList "tcp 3389" -NoNewWindow
