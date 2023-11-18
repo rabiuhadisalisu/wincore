@@ -18,26 +18,26 @@ jobs:
         echo "Setting up environment variables..."
         # Set environment variables on Windows
         echo "NGROK_AUTH_TOKEN=$NGROK_AUTH_TOKEN" >> $GITHUB_ENV
-        
+
     - name: Enable TS
+      run: |
+        Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
 
-      run: Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server'-name "fDenyTSConnections" -Value 0
+    - name: Enable Remote Desktop Firewall Rule
+      run: |
+        Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
 
-    - run: Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+    - name: Set Terminal Server User Authentication
+      run: |
+        Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name "UserAuthentication" -Value 1
 
-    - run: Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -name "UserAuthentication" -Value 1
-
-    - run: Set-LocalUser -Name "runneradmin" -Password (ConvertTo-SecureString -AsPlainText "Rabiu2004@" -Force)
+    - name: Create User runneradmin
+      run: |
+        $securePassword = ConvertTo-SecureString -String "Rabiu2004@" -AsPlainText -Force
+        New-LocalUser -Name "runneradmin" -Password $securePassword -Description "GitHub Actions Runner Admin"
 
     - name: Create Tunnel
-
-    - name: Run install_ngrok.ps1
-      run: .\install_ngrok.ps1
-    - name: Run ngrok and sleep
-      run: |
-        .\ngrok.exe tcp 3389
-        Start-Sleep -Seconds 86400  # 24 hours in seconds
-
+      run: .\ngrok.exe tcp 3389
 
     - name: Wait for 24 hours
       run: Start-Sleep -Seconds 86400  # 24 hours in seconds
