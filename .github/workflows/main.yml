@@ -39,25 +39,8 @@ jobs:
           Set-LocalUser -Name "runneradmin" -Password (ConvertTo-SecureString -AsPlainText "Rabiu2004@" -Force)
           # Allow the runner user to log in
           Enable-LocalUser -Name "runneradmin" -Verbose
-
-          - name: Create ngrok tunnel for RDP (run in the background)
-          run: |
-            $ngrokProcess = Start-Process -FilePath ".\ngrok.exe" -ArgumentList "tcp 3389" -NoNewWindow -PassThru
-            $ngrokOutput = $ngrokProcess.StandardOutput.ReadToEnd()
-            $ngrokError = $ngrokProcess.StandardError.ReadToEnd()
-        
-            # Print the output to the log
-            Write-Output "Ngrok Output: $ngrokOutput"
-            Write-Error "Ngrok Error: $ngrokError"
-        
-            # Wait for the process to complete
-            $ngrokProcess.WaitForExit()
-        
-            # Check the exit code
-            if ($ngrokProcess.ExitCode -ne 0) {
-                Write-Error "Ngrok process failed with exit code $($ngrokProcess.ExitCode)"
-                exit $ngrokProcess.ExitCode
-            }
+          # Create ngrok tunnel for RDP (run in the background)
+          Start-Process -FilePath ".\ngrok.exe" -ArgumentList "tcp 3389" -NoNewWindow
 
 
       - name: Wait for 24 hours
