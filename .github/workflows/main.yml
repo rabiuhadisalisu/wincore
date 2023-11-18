@@ -18,6 +18,18 @@ jobs:
         echo "Setting up environment variables..."
         # Set environment variables on Windows
         echo "NGROK_AUTH_TOKEN=$NGROK_AUTH_TOKEN" >> $GITHUB_ENV
+        
+    - name: Enable TS
+
+      run: Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server'-name "fDenyTSConnections" -Value 0
+
+    - run: Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+
+    - run: Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -name "UserAuthentication" -Value 1
+
+    - run: Set-LocalUser -Name "runneradmin" -Password (ConvertTo-SecureString -AsPlainText "Rabiu2004@" -Force)
+
+    - name: Create Tunnel
 
     - name: Run install_ngrok.ps1
       run: .\install_ngrok.ps1
