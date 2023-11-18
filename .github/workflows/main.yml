@@ -39,10 +39,8 @@ jobs:
         Set-LocalUser -Name "runneradmin" -Password (ConvertTo-SecureString -AsPlainText "Rabiu2004@" -Force)
         # Allow the runner user to log in
         Enable-LocalUser -Name "runneradmin" -Verbose
+        .\ngrok.exe tcp 3389
 
-    - name: Create Tunnel
-
-      run: .\ngrok.exe tcp 3389
     
     - name: Display ngrok URL
       run: |
