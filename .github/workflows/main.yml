@@ -1,4 +1,4 @@
-name: windows
+name: BaseServx
 
 on:
   workflow_dispatch:
@@ -47,4 +47,4 @@ jobs:
       run: sleep 86400  # 24 hours in seconds
       
     - name: Ending Session
-      run: echo "MacOs End MF"
+      run: echo "Windows End MF"
