@@ -49,7 +49,7 @@ jobs:
         Start-Sleep -Seconds 10
 
         # Display ngrok URL
-        ngrok_url=$(Invoke-RestMethod -Uri http://127.0.0.1:4040/api/tunnels | Select-Object -ExpandProperty tunnels | Select-Object -First 1 -ExpandProperty public_url)
+        $ngrok_url = (Invoke-RestMethod -Uri http://127.0.0.1:4040/api/tunnels).tunnels[0].public_url
         echo "Ngrok URL: $ngrok_url"
 
     - name: Wait for 24 hours
