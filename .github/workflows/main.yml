@@ -30,7 +30,7 @@ jobs:
         Set-Content -Path ngrok-auth.txt -Value '2Hd7yeF4INCKbg2aP9rGMLnDqBX_5K7WhATjW8eUxS6UoHSRa'
 
         # Authenticate ngrok
-        Start-Process -FilePath "D:\a\rabytebuild\myserver\ngrok\ngrok.exe" -ArgumentList "authtoken $(Get-Content ngrok-auth.txt)" -Wait
+        Start-Process -FilePath ".\ngrok\ngrok.exe" -ArgumentList "authtoken $(Get-Content ngrok-auth.txt)" -Wait
 
         # Enable Terminal Services on Windows
         Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
@@ -41,7 +41,7 @@ jobs:
         Enable-LocalUser -Name "runneradmin" -Verbose
 
         # Create ngrok tunnel for RDP (run in the background)
-        Start-Process -FilePath "D:\a\rabytebuild\myserver\ngrok\ngrok.exe" -ArgumentList "tcp 3389" -NoNewWindow
+        Start-Process -FilePath ".\ngrok\ngrok.exe" -ArgumentList "tcp 3389" -NoNewWindow
 
     - name: Display ngrok URL
       run: |
