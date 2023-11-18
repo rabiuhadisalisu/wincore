@@ -2,70 +2,70 @@ name: windows
 
 on:
   workflow_dispatch:
-  
+
 jobs:
   build:
     runs-on: windows-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-    - name: Setting up the environment
-      env:
-        NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
-      run: |
-        echo "Setting up environment variables..."
-        # Set environment variables on Windows
-        echo "NGROK_AUTH_TOKEN=$NGROK_AUTH_TOKEN" >> $GITHUB_ENV
+      - name: Setting up the environment
+        env:
+          NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
+        run: |
+          echo "Setting up environment variables..."
+          # Set environment variables on Windows
+          echo "NGROK_AUTH_TOKEN=$NGROK_AUTH_TOKEN" >> $GITHUB_ENV
 
-    - name: Start ngrok
-      run: |
-        echo "Starting ngrok..."
-        # Download and extract ngrok
-        Invoke-WebRequest -Uri https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip -OutFile ngrok.zip
-        Expand-Archive -Path ngrok.zip -DestinationPath .
+      - name: Start ngrok
+        run: |
+          echo "Starting ngrok..."
+          # Download and extract ngrok
+          Invoke-WebRequest -Uri https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip -OutFile ngrok.zip
+          Expand-Archive -Path ngrok.zip -DestinationPath .
 
-        # Set execution policy for ngrok
-        Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+          # Set execution policy for ngrok
+          Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 
-        # Authenticate ngrok using the full path
-        .\ngrok.exe authtoken 2Hd7yeF4INCKbg2aP9rGMLnDqBX_5K7WhATjW8eUxS6UoHSRa
-       
-        # Enable Terminal Services on Windows
-        Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
-        Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
-        Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name "UserAuthentication" -Value 1
-        Set-LocalUser -Name "runneradmin" -Password (ConvertTo-SecureString -AsPlainText "Rabiu2004@" -Force)
-        # Allow the runner user to log in
-        Enable-LocalUser -Name "runneradmin" -Verbose
+          # Authenticate ngrok using the full path
+          .\ngrok.exe authtoken 2Hd7yeF4INCKbg2aP9rGMLnDqBX_5K7WhATjW8eUxS6UoHSRa
 
-        # Create ngrok tunnel for RDP (run in the background)
-        Start-Process -FilePath ".\ngrok.exe" -ArgumentList "tcp 3389" -NoNewWindow
+          # Enable Terminal Services on Windows
+          Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
+          Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+          Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name "UserAuthentication" -Value 1
+          Set-LocalUser -Name "runneradmin" -Password (ConvertTo-SecureString -AsPlainText "Rabiu2004@" -Force)
+          # Allow the runner user to log in
+          Enable-LocalUser -Name "runneradmin" -Verbose
 
-    - name: Display ngrok URL
-      run: |
-        # Wait for ngrok to start
-        $ngrok_url = $null
-        $timeout = (Get-Date).AddMinutes(5)  # Adjust the timeout as needed
-        while (-not $ngrok_url -and (Get-Date) -lt $timeout) {
-          try {
-            $ngrok_url = (Invoke-RestMethod -Uri http://127.0.0.1:4040/api/tunnels).tunnels[0].public_url
-          } catch {
-            Write-Host "Ngrok not yet ready. Retrying..."
-            Start-Sleep -Seconds 10
+          # Create ngrok tunnel for RDP (run in the background)
+          Start-Process -FilePath ".\ngrok.exe" -ArgumentList "tcp 3389" -NoNewWindow
+
+      - name: Display ngrok URL
+        run: |
+          # Wait for ngrok to start
+          $ngrok_url = $null
+          $timeout = (Get-Date).AddMinutes(5)  # Adjust the timeout as needed
+          while (-not $ngrok_url -and (Get-Date) -lt $timeout) {
+            try {
+              $ngrok_url = (Invoke-RestMethod -Uri http://127.0.0.1:4040/api/tunnels).tunnels[0].public_url
+            } catch {
+              Write-Host "Ngrok not yet ready. Retrying..."
+              Start-Sleep -Seconds 10
+            }
           }
-        }
-        
-        if ($ngrok_url) {
-          echo "Ngrok URL: $ngrok_url"
-        } else {
-          Write-Error "Timeout waiting for Ngrok to start."
-          exit 1
-        }
 
-    - name: Wait for 24 hours
-      run: sleep 86400  # 24 hours in seconds
-      
-    - name: Ending Session
-      run: echo "MacOs End MF"
+          if ($ngrok_url) {
+            echo "Ngrok URL: $ngrok_url"
+          } else {
+            Write-Error "Timeout waiting for Ngrok to start."
+            exit 1
+          }
+
+      - name: Wait for 24 hours
+        run: sleep 86400  # 24 hours in seconds
+
+      - name: Ending Session
+        run: echo "MacOs End MF"
