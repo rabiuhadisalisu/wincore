@@ -31,10 +31,9 @@ jobs:
       run: |
         Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name "UserAuthentication" -Value 1
 
-    - name: Create User runneradmin
+    - name: Create Password
       run: |
         $securePassword = ConvertTo-SecureString -String "Rabiu2004@" -AsPlainText -Force
-        New-LocalUser -Name "runneradmin" -Password $securePassword -Description "GitHub Actions Runner Admin"
 
     - name: Create Tunnel
       run: .\ngrok.exe tcp 3389
