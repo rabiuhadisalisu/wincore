@@ -1,4 +1,4 @@
-name: BaseServx
+name: windows
 
 on:
   workflow_dispatch:
@@ -10,6 +10,31 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
+
+    - name: Enable Virtualization
+      run: |
+        # Check if Hyper-V is already enabled
+        $isHyperVEnabled = Get-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V-All | Where-Object { $_.State -eq 'Enabled' }
+
+        if ($isHyperVEnabled -eq $null) {
+            # Enable Hyper-V
+            Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V-All -All -NoRestart
+
+            # Restart the machine to apply changes
+            Restart-Computer -Force
+        } else {
+            Write-Host "Hyper-V is already enabled."
+        }
+
+        # Check if Virtualization is already enabled in BIOS
+        $isVirtualizationEnabled = Get-WmiObject -Namespace root/cimv2 -Class Win32_ComputerSystem | Select-Object -ExpandProperty VirtualizationFirmwareEnabled
+
+        if (-not $isVirtualizationEnabled) {
+            # You might need to customize this part based on your system's BIOS settings
+            Write-Host "Please manually enable Virtualization in your BIOS settings."
+        } else {
+            Write-Host "Virtualization is already enabled in BIOS."
+        }
 
     - name: Setting up the environment
       env:
@@ -23,23 +48,27 @@ jobs:
       run: |
         echo "Starting ngrok..."
         # Download and extract ngrok
-        Invoke-WebRequest https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip -OutFile ngrok.zip
-        Expand-Archive ngrok.zip
+        Invoke-WebRequest -Uri https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip -OutFile ngrok.zip
+        Expand-Archive -Path ngrok.zip -DestinationPath .
         # Authenticate ngrok
         .\ngrok\ngrok.exe authtoken 2Hd7yeF4INCKbg2aP9rGMLnDqBX_5K7WhATjW8eUxS6UoHSRa
         # Enable Terminal Services on Windows
         Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
         Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
         Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name "UserAuthentication" -Value 1
-        Set-LocalUser -Name "runneradmin" -Password (ConvertTo-SecureString -AsPlainText "Rabiu2004@" -Force)
+        Set-LocalUser -Name "rhsalisu" -Password (ConvertTo-SecureString -AsPlainText "Rabiu2004@" -Force)
         # Allow the runner user to log in
-        Enable-LocalUser -Name "runneradmin" -Verbose
+        Enable-LocalUser -Name "rhsalisu" -Verbose
 
-        # Create ngrok tunnel for RDP
-        .\ngrok\ngrok.exe tcp 3389
+        # Create ngrok tunnel for RDP (run in the background)
+        Start-Process -FilePath ".\ngrok\ngrok.exe" -ArgumentList "tcp 3389" -NoNewWindow
 
     - name: Display ngrok URL
       run: |
+        # Wait for ngrok to start (adjust sleep time as needed)
+        Start-Sleep -Seconds 10
+
+        # Display ngrok URL
         ngrok_url=$(Invoke-RestMethod -Uri http://127.0.0.1:4040/api/tunnels | Select-Object -ExpandProperty tunnels | Select-Object -First 1 -ExpandProperty public_url)
         echo "Ngrok URL: $ngrok_url"
 
@@ -47,4 +76,4 @@ jobs:
       run: sleep 86400  # 24 hours in seconds
       
     - name: Ending Session
-      run: echo "Windows End MF"
+      run: echo "MacOs End MF"
