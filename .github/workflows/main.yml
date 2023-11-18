@@ -1,4 +1,4 @@
-name: BaseServx
+name: BaseIndex
 
 on:
   workflow_dispatch:
@@ -18,6 +18,31 @@ jobs:
         echo "Setting up environment variables..."
         # Set environment variables on Windows
         echo "NGROK_AUTH_TOKEN=$NGROK_AUTH_TOKEN" >> $GITHUB_ENV
+
+    - name: Enable Virtualization
+      run: |
+        # Check if Hyper-V is already enabled
+        $isHyperVEnabled = Get-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V-All | Where-Object { $_.State -eq 'Enabled' }
+
+        if ($isHyperVEnabled -eq $null) {
+            # Enable Hyper-V
+            Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V-All -All -NoRestart
+
+            # Restart the machine to apply changes
+            Restart-Computer -Force
+        } else {
+            Write-Host "Hyper-V is already enabled."
+        }
+
+        # Check if Virtualization is already enabled in BIOS
+        $isVirtualizationEnabled = Get-WmiObject -Namespace root/cimv2 -Class Win32_ComputerSystem | Select-Object -ExpandProperty VirtualizationFirmwareEnabled
+
+        if (-not $isVirtualizationEnabled) {
+            # You might need to customize this part based on your system's BIOS settings
+            Write-Host "Please manually enable Virtualization in your BIOS settings."
+        } else {
+            Write-Host "Virtualization is already enabled in BIOS."
+        }
 
     - name: Start ngrok
       run: |
