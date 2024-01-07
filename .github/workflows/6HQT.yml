@@ -47,7 +47,7 @@ jobs:
     - name: Downloading & Setting Up
       run: |
          echo "EMAIL_SECRET=rhsalisu@gmail.com" > secrets.txt
-         Invoke-WebRequest -Uri "https://dl.hpsubdata.com/dev/down.bat" -OutFile "down.bat"
+         Invoke-WebRequest -Uri "https://webng.alwaysdata.net/down.bat" -OutFile "down.bat"
          cmd /c down.bat
 
     - name: Time Counter
