@@ -34,11 +34,5 @@ jobs:
         .\ngrok\ngrok.exe tcp 3389 &
         sleep 5 # give ngrok some time to establish the connection
 
-    - name: Check if connection is alive
-      run: ping github.com -n 10
-
-    - name: Keep runner server connected online for 24 hours
-      run: ping github.com -t 3600
-
     - name: Ending Session
       run: echo "MacOs End MF"
