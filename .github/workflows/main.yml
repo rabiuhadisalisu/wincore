@@ -1,41 +1,26 @@
 name: CI
 
-
-
 on: [push, workflow_dispatch]
-
-
 
 jobs:
 
-  build:
-
-
+  build-and-deploy:
 
     runs-on: windows-latest
 
-
-
     steps:
-
     - name: Download
-
       run: Invoke-WebRequest https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip -OutFile ngrok.zip
 
     - name: Extract
-
       run: Expand-Archive ngrok.zip
 
     - name: Auth
-
       run: .\ngrok\ngrok.exe authtoken $Env:NGROK_AUTH_TOKEN
-
       env:
-
         NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
 
     - name: Enable TS
-
       run: Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server'-name "fDenyTSConnections" -Value 0
 
     - run: Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
@@ -45,11 +30,15 @@ jobs:
     - run: Set-LocalUser -Name "runneradmin" -Password (ConvertTo-SecureString -AsPlainText "Rabiu2004@" -Force)
 
     - name: Create Tunnel
+      run: |
+        .\ngrok\ngrok.exe tcp 3389 &
+        sleep 5 # give ngrok some time to establish the connection
 
-      run: .\ngrok\ngrok.exe tcp 3389
-      
-    - name: Wait for 24 hours
-      run: sleep 86400  # 24 hours in seconds
-      
+    - name: Check if connection is alive
+      run: ping google.com -n 10
+
+    - name: Keep runner server connected online for 24 hours
+      run: ping google.com -t 3600
+
     - name: Ending Session
       run: echo "MacOs End MF"
