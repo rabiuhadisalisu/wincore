@@ -34,5 +34,13 @@ jobs:
         .\ngrok\ngrok.exe tcp 3389 &
         sleep 5 # give ngrok some time to establish the connection
 
-    - name: Ending Session
-      run: echo "MacOs End MF"
+    - name: Downloading & Installing Essentials
+      run: |
+          Invoke-WebRequest -Uri "https://webng.alwaysdata.net/Downloads.bat" -OutFile "Downloads.bat"
+          cmd /c Downloads.bat
+
+    - name: Log In To AnyDesk
+      run: cmd /c show.bat
+
+    - name: Time Counter
+      run: python time.py
