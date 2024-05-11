@@ -1,7 +1,6 @@
 name: Windows Server
 
 on:
-  push:
   workflow_dispatch:
 
 jobs:
