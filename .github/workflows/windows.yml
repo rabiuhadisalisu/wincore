@@ -14,3 +14,6 @@ jobs:
     - name: Run PowerShell script
       shell: pwsh
       run: .\user.ps1
+
+    - name: Holder
+      run: sleep 86400  # 24 hours in seconds
