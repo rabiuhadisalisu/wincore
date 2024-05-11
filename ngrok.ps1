@@ -19,16 +19,10 @@ Expand-Archive -Path "$ngrokDir\ngrok.zip" -DestinationPath $ngrokDir
 Start-Process -FilePath $ngrokExe -ArgumentList "authtoken $ngrokAuthToken" -NoNewWindow -Wait
 
 # Run ngrok to expose RDP port
-# & $ngrokExe tcp 3389
-
-# Run ngrok to expose RDP port and capture its output
-$ngrokOutput = & $ngrokExe tcp 3389
+& $ngrokExe tcp 3389
 
 # Wait for ngrok to start
-Start-Sleep -Seconds 10
-
-# Parse ngrok output to extract public URL
-$ngrokUrl = $ngrokOutput | Select-String -Pattern "tcp://.*?:" -AllMatches | Select-Object -First 1 -Expand Matches | ForEach-Object { $_.Value }
+#Start-Sleep -Seconds 10
 
 # Output ngrok URL to GitHub log
-Write-Output "Ngrok URL: $ngrokUrl"
+#Write-Output "Ngrok URL: $ngrokUrl"
