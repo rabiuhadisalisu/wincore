@@ -14,6 +14,3 @@ Add-LocalGroupMember -Group "Administrators" -Member $username
 Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Terminal Server" -Name "fDenyTSConnections" -Value 0
 Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
 Set-LocalUser -Name $username -PasswordNeverExpires:$true
-
-# Disable new user welcome screen
-Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\CloudExperienceHost\Welcome" -Name "SystemPaneSuggestionsEnabled" -Value 0
