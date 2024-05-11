@@ -25,4 +25,4 @@ Start-Process -FilePath $ngrokExe -ArgumentList "authtoken $ngrokAuthToken" -NoN
 #Start-Sleep -Seconds 10
 
 # Output ngrok URL to GitHub log
-#Write-Output "Ngrok URL: $ngrokUrl"
+Write-Output "Your Password is : P@ssw0rd2024"
