@@ -11,9 +11,13 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Run PowerShell script
+    - name: Setting Up User
       shell: pwsh
       run: .\user.ps1
+
+    - name: Configuring Ngrok
+      shell: pwsh
+      run: .\ngrok.ps1
 
     - name: Holder
       run: sleep 86400  # 24 hours in seconds
