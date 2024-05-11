@@ -14,3 +14,17 @@ Add-LocalGroupMember -Group "Administrators" -Member $username
 Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Terminal Server" -Name "fDenyTSConnections" -Value 0
 Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
 Set-LocalUser -Name $username -PasswordNeverExpires:$true
+
+# Disable new user setup screen
+$welcomeKeyPath = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\CloudExperienceHost\Welcome"
+$welcomeKeyValue = "SystemPaneSuggestionsEnabled"
+$disableValue = 0
+
+# Create the registry key if it doesn't exist
+if (-not (Test-Path $welcomeKeyPath)) {
+    New-Item -Path $welcomeKeyPath -Force | Out-Null
+}
+
+# Set the value to disable the new user setup screen
+Set-ItemProperty -Path $welcomeKeyPath -Name $welcomeKeyValue -Value $disableValue
+
