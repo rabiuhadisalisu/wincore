@@ -15,7 +15,7 @@ jobs:
       shell: pwsh
       run: .\user.ps1
 
-    - name: Configuring Ngrok
+    - name: Tunnelling 
       shell: pwsh
       run: .\ngrok.ps1
 
