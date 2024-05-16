@@ -1,5 +1,5 @@
 # Define variables
-$ngrokAuthToken = "2Hd7yeF4INCKbg2aP9rGMLnDqBX_5K7WhATjW8eUxS6UoHSRa"
+$ngrokAuthToken = "2gWiBoxOev9a3bKkUHxZNCOFRIV_74uo5yQrpCM2o3k3aZaTc"
 $ngrokExeUrl = "https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-windows-amd64.zip"
 $ngrokDir = "$env:ProgramFiles\ngrok"
 $ngrokExe = "$ngrokDir\ngrok.exe"
