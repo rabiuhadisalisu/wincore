@@ -19,7 +19,7 @@ Expand-Archive -Path "$ngrokDir\ngrok.zip" -DestinationPath $ngrokDir
 Start-Process -FilePath $ngrokExe -ArgumentList "authtoken $ngrokAuthToken" -NoNewWindow -Wait
 
 # Run ngrok to expose RDP port
-Start-Process -FilePath $ngrokExe -ArgumentList "tcp 3389" -Wait
+Start-Process -FilePath $ngrokExe -ArgumentList "tcp 3389" 
 
 # Wait for ngrok to start
 Start-Sleep -Seconds 10
