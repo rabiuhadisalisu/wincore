@@ -19,10 +19,10 @@ Expand-Archive -Path "$ngrokDir\ngrok.zip" -DestinationPath $ngrokDir
 Start-Process -FilePath $ngrokExe -ArgumentList "authtoken $ngrokAuthToken" -NoNewWindow -Wait
 
 # Run ngrok to expose RDP port
-Start-Job -ScriptBlock { param($ngrokExe) & $ngrokExe tcp 3389 } -ArgumentList (Join-Path $ngrokDir 'ngrok.exe')
+Start-Process -FilePath $ngrokExe -ArgumentList "tcp 3389" -NoNewWindow
 
 # Wait for ngrok to start
-#Start-Sleep -Seconds 10
+Start-Sleep -Seconds 10
 
 # Output ngrok URL to GitHub log
 Write-Output "Your Password is : P@ssw0rd2024"
