@@ -1,5 +1,5 @@
 # Define variables
-$ngrokAuthToken = "2gWiBoxOev9a3bKkUHxZNCOFRIV_74uo5yQrpCM2o3k3aZaTc"
+$ngrokAuthToken = "2gWnhwlMI1DU9VRwXZAJDPlG0to_5MGvF37Zb99EFMguzMHcF"
 $ngrokExeUrl = "https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-windows-amd64.zip"
 $ngrokDir = "$env:ProgramFiles\ngrok"
 $ngrokExe = "$ngrokDir\ngrok.exe"
@@ -19,7 +19,7 @@ Expand-Archive -Path "$ngrokDir\ngrok.zip" -DestinationPath $ngrokDir
 Start-Process -FilePath $ngrokExe -ArgumentList "authtoken $ngrokAuthToken" -NoNewWindow -Wait
 
 # Run ngrok to expose RDP port
-Start-Process -FilePath $ngrokExe -ArgumentList "tcp 3389" -NoNewWindow
+Start-Process -FilePath $ngrokExe -ArgumentList "tcp 3389" -Wait
 
 # Wait for ngrok to start
 Start-Sleep -Seconds 10
