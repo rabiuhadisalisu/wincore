@@ -17,10 +17,6 @@ jobs:
 
     - name: Tunnelling 
       shell: pwsh
-      run: .\burp.ps1
-
-    - name: Tunnelling 
-      shell: pwsh
       run: .\ngrok.ps1
 
     - name: Holder
