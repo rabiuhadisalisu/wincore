@@ -47,7 +47,9 @@ credentials-file: $configDirectory\$tunnelUUID.json
 
 # Save the config file
 Set-Content -Path $configFilePath -Value $configContent
-#Running Tunnel
-$downloadPath tunnel run $tunnelUUID
+
+Write-Host "Start Running Tunnel..."
+$tunnelStartCmdx = "$downloadPath tunnel run $tunnelUUID"
+Invoke-Expression $tunnelStartCmdx
 
 Write-Host "Cloudflare Tunnel for RDP is set up and running with configuration in $configFilePath"
