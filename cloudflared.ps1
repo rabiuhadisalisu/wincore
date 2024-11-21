@@ -8,7 +8,7 @@ $rdpPort = 3389
 
 # Ensure temporary directory exists
 if (-not (Test-Path -Path $env:TEMP)) {
-  New-Item -ItemType Directory -Path $env:TEMP
+    New-Item -ItemType Directory -Path $env:TEMP
 }
 
 # Download Cloudflare Tunnel
@@ -17,8 +17,8 @@ Invoke-WebRequest -Uri $downloadUrl -OutFile $downloadPath
 
 # Install Cloudflare Tunnel with token
 if (-not $tunnelToken) {
-  Write-Error "Error: Tunnel token not provided."
-  exit 1
+    Write-Error "Error: Tunnel token not provided."
+    exit 1
 }
 
 Write-Host "Installing Cloudflare Tunnel..."
@@ -36,14 +36,17 @@ Write-Host "Creating config.yml file at: $configFilePath"
 # Check if the config file directory exists
 $configDirectory = [System.IO.Path]::GetDirectoryName($configFilePath)
 if (-not (Test-Path -Path $configDirectory)) {
-  New-Item -ItemType Directory -Path $configDirectory
+    New-Item -ItemType Directory -Path $configDirectory
 }
+
+# Determine the path to cert.pem dynamically
+$certFilePath = "$env:USERPROFILE\.cloudflared\cert.pem"
 
 # Create the config file content
 $configContent = @"
 tunnel: $tunnelUUID
 credentials-file: $configDirectory\$tunnelUUID.json
-cert-file: C:\Users\<YourUser>\.cloudflared\cert.pem
+cert-file: $certFilePath
 "@
 
 # Save the config file
