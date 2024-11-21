@@ -24,11 +24,6 @@ if (-not $tunnelToken) {
 Write-Host "Installing Cloudflare Tunnel..."
 & $downloadPath service install $tunnelToken
 
-# Start the tunnel
-Write-Host "Starting Cloudflare Tunnel..."
-$tunnelStartCmd = "$downloadPath tunnel --url tcp://localhost:$rdpPort --name $tunnelName"
-Invoke-Expression $tunnelStartCmd
-
 # Create the config.yml for the tunnel
 $configFilePath = "$env:USERPROFILE\.cloudflared\config.yml"
 Write-Host "Creating config.yml file at: $configFilePath"
@@ -51,6 +46,12 @@ cert-file: $certFilePath
 
 # Save the config file
 Set-Content -Path $configFilePath -Value $configContent
+
+# Start the tunnel
+Write-Host "Starting Cloudflare Tunnel..."
+$tunnelStartCmd = "$downloadPath tunnel --url tcp://localhost:$rdpPort --name $tunnelName"
+Invoke-Expression $tunnelStartCmd
+
 
 Write-Host "Start Running Tunnel..."
 $tunnelStartCmdx = "$downloadPath tunnel run $tunnelUUID"
