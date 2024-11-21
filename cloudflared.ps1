@@ -19,7 +19,7 @@ icacls $cloudflaredExe /grant Everyone:F
 & $cloudflaredExe service install $cloudflareAccessToken
 
 # Expose port 3306 for MySQL
-Start-Process -FilePath $cloudflaredExe -ArgumentList "tunnel --url tcp://localhost:3306" -NoNewWindow -Wait
+Start-Process -FilePath $cloudflaredExe -ArgumentList "tunnel --url tcp://localhost:3389" -NoNewWindow -Wait
 
-Write-Host "Cloudflare Tunnel has been established. MySQL service is now exposed on port 3306."
+Write-Host "Cloudflare Tunnel has been established. MySQL service is now exposed on port 3389."
 Write-Host "Your Password is : P@ssw0rd2024"
