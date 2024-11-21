@@ -2,7 +2,8 @@
 $downloadUrl = "https://github.com/cloudflare/cloudflared/releases/download/2024.11.1/cloudflared-windows-amd64.exe"
 $downloadPath = "$env:TEMP\cloudflared.exe"
 $tunnelToken = "eyJhIjoiMzk0M2Q0ZWMxOGM1MzkxZmJiZTkxNThhNWQ2MjliNTUiLCJ0IjoiZDZmYTU2YjMtODRhNy00MDc0LTljZjgtMmFlODQ5ODM1NzQ2IiwicyI6Ik9UUmxOMkppWWpVdE0yVTROUzAwT1dZekxXSmlOV010WkdJMU56bGpaVFJoTXpnMCJ9"
-$tunnelName = "RDPCORE"
+$tunnelName = "RDP_WIN_XXS"
+$tunnelUUID = "d6fa56b3-84a7-4074-9cf8-2ae849835746"
 $rdpPort = 3389
 
 # Ensure temporary directory exists
@@ -25,7 +26,7 @@ Write-Host "Installing Cloudflare Tunnel..."
 
 # Start the tunnel
 Write-Host "Starting Cloudflare Tunnel..."
-$tunnelStartCmd = "$downloadPath tunnel --url http://localhost:$rdpPort --name $tunnelName"
+$tunnelStartCmd = "$downloadPath tunnel --url tcp://localhost:$rdpPort --name $tunnelName"
 Invoke-Expression $tunnelStartCmd
 
 # Create the config.yml for the tunnel
@@ -40,12 +41,13 @@ if (-not (Test-Path -Path $configDirectory)) {
 
 # Create the config file content
 $configContent = @"
-url: http://localhost:$rdpPort
-tunnel: $tunnelName
-credentials-file: $configDirectory\$tunnelName.json
+tunnel: $tunnelUUID
+credentials-file: $configDirectory\$tunnelUUID.json
 "@
 
 # Save the config file
 Set-Content -Path $configFilePath -Value $configContent
+#Running Tunnel
+$downloadPath tunnel run $tunnelUUID
 
 Write-Host "Cloudflare Tunnel for RDP is set up and running with configuration in $configFilePath"
