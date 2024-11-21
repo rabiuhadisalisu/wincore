@@ -1,49 +1,56 @@
-# Define variables
+# Define Variables
 $cloudflaredExeUrl = "https://github.com/cloudflare/cloudflared/releases/download/2024.10.0/cloudflared-windows-amd64.exe"
 $cloudflaredDir = "$env:ProgramFiles\cloudflared"
 $cloudflaredExe = "$cloudflaredDir\cloudflared.exe"
 $cloudflareAccessToken = "eyJhIjoiMzk0M2Q0ZWMxOGM1MzkxZmJiZTkxNThhNWQ2MjliNTUiLCJ0IjoiZTkxYTJmOWEtODM0Ni00OTVmLWJmZDQtZTE2MGRlYmEzMGY2IiwicyI6Ik9UTTVaVGhpTm1FdE4yVmhNaTAwT1dSaExUazNNekF0WTJVd1lqVmpNekF4WldRMyJ9"
-$subdomain = "rdp.rabyte.com.ng"
+$tunnelName = "rdp-tunnel"
+$tunnelHostname = "rdp.rabyte.com.ng"
+$configFile = "$env:USERPROFILE\.cloudflared\config.yml"
 
-# Create cloudflared directory if it doesn't exist
+# Ensure cloudflared directory exists
 if (-not (Test-Path -Path $cloudflaredDir)) {
     New-Item -Path $cloudflaredDir -ItemType Directory | Out-Null
 }
 
-# Download cloudflared executable
+# Download and install cloudflared if not already installed
 if (-not (Test-Path -Path $cloudflaredExe)) {
-    Write-Host "Downloading Cloudflared executable..."
+    Write-Host "Downloading cloudflared executable..."
     Invoke-WebRequest -Uri $cloudflaredExeUrl -OutFile $cloudflaredExe
     icacls $cloudflaredExe /grant Everyone:F
 }
 
-# Install the Cloudflare Tunnel service using the provided token
-Write-Host "Installing Cloudflare Tunnel service..."
-& $cloudflaredExe service install $cloudflareAccessToken
+# Create a new Cloudflare Tunnel using the provided access token
+Write-Host "Creating a new Cloudflare Tunnel..."
+& $cloudflaredExe tunnel create $tunnelName
 
-# Verify RDP availability
-Write-Host "Checking RDP service on localhost:3389..."
-try {
-    $tcpConnection = Test-NetConnection -ComputerName localhost -Port 3389
-    if (-not $tcpConnection.TcpTestSucceeded) {
-        Write-Error "RDP is not reachable on port 3389. Exiting..."
-        exit 1
-    }
-} catch {
-    Write-Error "An error occurred while testing RDP connection."
+# Retrieve Tunnel UUID
+$tunnelUUID = (& $cloudflaredExe tunnel list | Select-String $tunnelName).ToString().Split()[0]
+if (-not $tunnelUUID) {
+    Write-Error "Failed to retrieve Tunnel UUID. Exiting..."
     exit 1
 }
 
-# Create a subdomain and expose RDP with Cloudflare Tunnel
-Write-Host "Starting Cloudflare Tunnel in the background to expose RDP on $subdomain..."
-Start-Process -FilePath $cloudflaredExe -ArgumentList "tunnel --hostname $subdomain --url localhost:3389" -NoNewWindow
+# Generate a configuration file for the tunnel
+Write-Host "Creating configuration file for the tunnel..."
+if (-not (Test-Path -Path $configFile)) {
+    New-Item -Path $configFile -ItemType File | Out-Null
+}
 
-# Wait briefly to ensure the process has started
-Start-Sleep -Seconds 5
+$configContent = @"
+url: http://localhost:3389
+tunnel: $tunnelUUID
+credentials-file: $env:USERPROFILE\.cloudflared\$tunnelUUID.json
+"@
+Set-Content -Path $configFile -Value $configContent
 
-Write-Host "Cloudflare Tunnel has been established for RDP on $subdomain."
-Write-Host "Your Password is : P@ssw0rd2024"
+# Add DNS routing for the tunnel
+Write-Host "Adding DNS routing for the tunnel..."
+& $cloudflaredExe tunnel route dns $tunnelUUID $tunnelHostname
 
-# Continue to next commands
-Write-Host "Executing further commands..."
-# Add any additional commands below this line
+# Start the tunnel in the background using dispatch
+Write-Host "Starting the tunnel in the background..."
+Start-Process -FilePath $cloudflaredExe -ArgumentList "tunnel run $tunnelUUID" -NoNewWindow -RedirectStandardOutput "$env:USERPROFILE\cloudflared-log.txt" -RedirectStandardError "$env:USERPROFILE\cloudflared-error-log.txt"
+
+Write-Host "Cloudflare Tunnel setup complete!"
+Write-Host "RDP is now accessible at $tunnelHostname. Use this URL in your RDP client."
+Write-Host "Check logs for details at $env:USERPROFILE\cloudflared-log.txt"
