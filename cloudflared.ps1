@@ -1,5 +1,5 @@
 # Define Variables
-$cloudflaredExeUrl = "https://github.com/cloudflare/cloudflared/releases/download/2024.10.0/cloudflared-windows-amd64.exe"
+$cloudflaredExeUrl = "https://github.com/cloudflare/cloudflared/releases/download/2024.11.1/cloudflared-windows-amd64.exe"
 $cloudflaredDir = "$env:ProgramFiles\cloudflared"
 $cloudflaredExe = "$cloudflaredDir\cloudflared.exe"
 $cloudflareAccessToken = "eyJhIjoiMzk0M2Q0ZWMxOGM1MzkxZmJiZTkxNThhNWQ2MjliNTUiLCJ0IjoiZTkxYTJmOWEtODM0Ni00OTVmLWJmZDQtZTE2MGRlYmEzMGY2IiwicyI6Ik9UTTVaVGhpTm1FdE4yVmhNaTAwT1dSaExUazNNekF0WTJVd1lqVmpNekF4WldRMyJ9"
@@ -19,9 +19,13 @@ if (-not (Test-Path -Path $cloudflaredExe)) {
     icacls $cloudflaredExe /grant Everyone:F
 }
 
+# Authenticate cloudflared using the API token (bypassing login)
+Write-Host "Authenticating cloudflared with the API token..."
+$env:TUNNEL_ORIGIN_CERT = "$env:USERPROFILE\.cloudflared\cert.pem"  # This will use a saved cert.pem, or you can remove this if not using certificates
+
 # Create a new Cloudflare Tunnel using the provided access token
 Write-Host "Creating a new Cloudflare Tunnel..."
-& $cloudflaredExe tunnel create $tunnelName
+& $cloudflaredExe tunnel create $tunnelName --token $cloudflareAccessToken
 
 # Retrieve Tunnel UUID
 $tunnelUUID = (& $cloudflaredExe tunnel list | Select-String $tunnelName).ToString().Split()[0]
