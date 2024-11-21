@@ -1,12 +1,8 @@
 # Define variables
-$cloudflaredExeUrl = "https://github.com/cloudflare/cloudflared/releases/download/2024.11.1/cloudflared-windows-amd64.exe"
+$cloudflaredExeUrl = "https://github.com/cloudflare/cloudflared/releases/download/2024.10.0/cloudflared-windows-amd64.exe"
 $cloudflaredDir = "$env:ProgramFiles\cloudflared"
 $cloudflaredExe = "$cloudflaredDir\cloudflared.exe"
-$cloudflareApiKey = "YOUR_CLOUDFLARE_API_KEY"
-$cloudflareEmail = "YOUR_CLOUDFLARE_EMAIL"
-$cloudflareZoneId = "YOUR_ZONE_ID"  # Replace with your Cloudflare zone ID
-$tunnelName = "rdp-tunnel"
-$tunnelConfigFile = "$cloudflaredDir\config.yml"
+$cloudflareAccessToken = "eyJhIjoiMzk0M2Q0ZWMxOGM1MzkxZmJiZTkxNThhNWQ2MjliNTUiLCJ0IjoiZTkxYTJmOWEtODM0Ni00OTVmLWJmZDQtZTE2MGRlYmEzMGY2IiwicyI6Ik9UTTVaVGhpTm1FdE4yVmhNaTAwT1dSaExUazNNekF0WTJVd1lqVmpNekF4WldRMyJ9"
 
 # Create cloudflared directory if it doesn't exist
 if (-not (Test-Path -Path $cloudflaredDir)) {
@@ -19,31 +15,11 @@ Invoke-WebRequest -Uri $cloudflaredExeUrl -OutFile $cloudflaredExe
 # Make sure cloudflared is executable
 icacls $cloudflaredExe /grant Everyone:F
 
-# Create a Cloudflare Tunnel
-Write-Host "Creating Cloudflare Tunnel..."
-$tunnelResponse = Invoke-RestMethod -Uri "https://api.cloudflare.com/client/v4/accounts/$cloudflareZoneId/tunnels" `
-    -Method Post `
-    -Headers @{
-        "Authorization" = "Bearer $cloudflareApiKey"
-        "Content-Type" = "application/json"
-    } `
-    -Body (ConvertTo-Json @{
-        name = $tunnelName
-    })
+# Install the Cloudflare Tunnel service using the provided token
+& $cloudflaredExe service install $cloudflareAccessToken
 
-$tunnelId = $tunnelResponse.result.id
-Write-Host "Tunnel created with ID: $tunnelId"
+# Expose port 3306 for MySQL
+Start-Process -FilePath $cloudflaredExe -ArgumentList "tunnel --url tcp://localhost:3306" -NoNewWindow -Wait
 
-# Generate a configuration file for the tunnel
-@"
-url: tcp://localhost:3389
-tunnel: $tunnelId
-credentials-file: $cloudflaredDir/$tunnelName.json
-"@ | Set-Content -Path $tunnelConfigFile
-
-# Start the Cloudflare Tunnel
-Write-Host "Starting Cloudflare Tunnel..."
-Start-Process -FilePath $cloudflaredExe -ArgumentList "tunnel --config $tunnelConfigFile" -NoNewWindow -Wait
-
-Write-Host "Cloudflare Tunnel has been established. RDP service is now exposed."
+Write-Host "Cloudflare Tunnel has been established. MySQL service is now exposed on port 3306."
 Write-Host "Your Password is : P@ssw0rd2024"
