@@ -20,4 +20,4 @@ if (-not $token) {
 & $downloadPath service install $token
 
 # Create an RDP Tunnel (Replace with your desired configuration)
-& $downloadPath tunnel rdp --url rdp://0.0.0.0:3389
+& $downloadPath tunnel RDP_WIN_XXS --url rdp://0.0.0.0:3389
