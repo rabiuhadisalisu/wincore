@@ -43,6 +43,7 @@ if (-not (Test-Path -Path $configDirectory)) {
 $configContent = @"
 tunnel: $tunnelUUID
 credentials-file: $configDirectory\$tunnelUUID.json
+cert-file: C:\Users\<YourUser>\.cloudflared\cert.pem
 "@
 
 # Save the config file
