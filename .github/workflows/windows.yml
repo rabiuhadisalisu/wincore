@@ -17,7 +17,7 @@ jobs:
 
     - name: Tunnelling 
       shell: pwsh
-      run: .\cloudflared.ps1
+      run: .\ngrok.ps1
 
     - name: Holder
       run: sleep 86400  # 24 hours in seconds
