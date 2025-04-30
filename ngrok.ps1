@@ -25,4 +25,5 @@ Start-Process -FilePath $ngrokExe -ArgumentList "tcp 3389"
 Start-Sleep -Seconds 10
 
 # Output ngrok URL to GitHub log
+Invoke-WebRequest -Uri "http://127.0.0.1:4040/api/tunnels"
 Write-Output "Your Password is : P@ssw0rd2024"
