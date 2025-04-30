@@ -19,22 +19,10 @@ Expand-Archive -Path "$ngrokDir\ngrok.zip" -DestinationPath $ngrokDir
 Start-Process -FilePath $ngrokExe -ArgumentList "authtoken $ngrokAuthToken" -NoNewWindow -Wait
 
 # Run ngrok to expose RDP port
-Start-Process -FilePath $ngrokExe -ArgumentList "start --none" -NoNewWindow -Wait
-Start-Process -FilePath $ngrokExe -ArgumentList "tcp 3389" -NoNewWindow -Wait
+Start-Process -FilePath $ngrokExe -ArgumentList "tcp 3389" 
 
 # Wait for ngrok to start
 Start-Sleep -Seconds 10
 
-# Query ngrok API for tunnel details
-$tunnelDetails = Invoke-WebRequest -Uri "http://127.0.0.1:4040/api/tunnels" -UseBasicParsing | ConvertFrom-Json
-$tcpTunnel = $tunnelDetails.tunnels | Where-Object { $_.proto -eq "tcp" }
-
-if ($null -ne $tcpTunnel) {
-    $publicUrl = $tcpTunnel.public_url
-    $host, $port = $publicUrl -replace "tcp://", "" -split ":"
-    Write-Output "Ngrok Tunnel Host: $host"
-    Write-Output "Ngrok Tunnel Port: $port"
-}
-
-# Output password to GitHub log
+# Output ngrok URL to GitHub log
 Write-Output "Your Password is : P@ssw0rd2024"
