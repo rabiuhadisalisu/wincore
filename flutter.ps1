@@ -1,6 +1,6 @@
 # Run as Administrator
 
-$flutterZipUrl = "https://storage.googleapis.com/flutter_infra_release/releases/stable/windows/flutter_windows_stable.zip"
+$flutterZipUrl = "https://storage.googleapis.com/flutter_infra_release/releases/stable/windows/flutter_windows_3.32.4-stable.zip"
 $destinationFolder = "C:\tools"
 $flutterZipPath = "$env:TEMP\flutter.zip"
 $flutterInstallPath = "$destinationFolder\flutter"
