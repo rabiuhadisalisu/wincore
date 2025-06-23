@@ -15,10 +15,6 @@ jobs:
       shell: pwsh
       run: .\user.ps1
 
-    - name: Installing VSCode 
-      shell: pwsh
-      run: .\vscode.ps1
-
     - name: Tunnelling 
       shell: pwsh
       run: .\ngrok.ps1
