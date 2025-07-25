@@ -1,41 +1,50 @@
-# Run as Administrator
+# === CONFIG ===
+$javaHomePath = "C:\hostedtoolcache\windows\Java_Temurin-Hotspot_jdk\21.0.7-6.0\x64"
+$flutterArchiveUrl = "https://docs.flutter.dev/install/archive"
+$downloadFolder = "$env:USERPROFILE\Downloads"
+$extractFolder = "$env:USERPROFILE\dev"
+$flutterFolder = Join-Path $extractFolder "flutter"
+$flutterBin = Join-Path $flutterFolder "bin"
 
-$flutterZipUrl = "https://storage.googleapis.com/flutter_infra_release/releases/stable/windows/flutter_windows_3.32.4-stable.zip"
-$destinationFolder = "C:\tools"
-$flutterZipPath = "$env:TEMP\flutter.zip"
-$flutterInstallPath = "$destinationFolder\flutter"
-$flutterBinPath = "$flutterInstallPath\bin"
+# === 1. Set JAVA_HOME System Environment Variable ===
+[Environment]::SetEnvironmentVariable("JAVA_HOME", $javaHomePath, "Machine")
+Write-Host "✅ JAVA_HOME set to: $([Environment]::GetEnvironmentVariable("JAVA_HOME", "Machine"))"
 
-# Create destination folder
-if (!(Test-Path -Path $destinationFolder)) {
-    New-Item -Path $destinationFolder -ItemType Directory -Force
+# === 2. Get the latest Flutter Windows stable version ZIP from the archive page ===
+Write-Host "`n📥 Fetching latest Flutter Windows ZIP URL..."
+
+$html = Invoke-WebRequest -Uri $flutterArchiveUrl -UseBasicParsing
+
+$flutterZipRelativeUrl = ($html.Links | Where-Object {
+    $_.href -match "flutter_windows_.*-stable.zip"
+} | Select-Object -First 1).href
+
+if (-not $flutterZipRelativeUrl) {
+    Write-Error "❌ Could not find a valid Flutter Windows ZIP URL."
+    exit 1
 }
 
-# Download Flutter ZIP
-Write-Output "Downloading Flutter SDK..."
-Invoke-WebRequest -Uri $flutterZipUrl -OutFile $flutterZipPath
+$flutterZipUrl = "https://storage.googleapis.com" + $flutterZipRelativeUrl
+$zipFileName = Split-Path $flutterZipUrl -Leaf
+$zipPath = Join-Path $downloadFolder $zipFileName
 
-# Extract ZIP
-Write-Output "Extracting Flutter SDK..."
-Expand-Archive -Path $flutterZipPath -DestinationPath $destinationFolder -Force
+Write-Host "📦 Downloading: $flutterZipUrl"
+Invoke-WebRequest -Uri $flutterZipUrl -OutFile $zipPath
 
-# Remove ZIP
-Remove-Item $flutterZipPath -Force
+# === 3. Extract Flutter ZIP ===
+Write-Host "📂 Extracting to $extractFolder..."
+Expand-Archive -Path $zipPath -DestinationPath $extractFolder -Force
+Write-Host "✅ Flutter extracted to: $flutterFolder"
 
-# Add Flutter to System PATH if not already added
-$systemPath = [Environment]::GetEnvironmentVariable("Path", [System.EnvironmentVariableTarget]::Machine)
+# === 4. Set Flutter BIN to System PATH if not present ===
+$envPath = [Environment]::GetEnvironmentVariable("Path", "Machine")
 
-if ($systemPath -notlike "*$flutterBinPath*") {
-    Write-Output "Adding Flutter to System PATH..."
-    $newPath = "$systemPath;$flutterBinPath"
-    [Environment]::SetEnvironmentVariable("Path", $newPath, [System.EnvironmentVariableTarget]::Machine)
+if ($envPath -notmatch [regex]::Escape($flutterBin)) {
+    $newPath = $envPath + ";" + $flutterBin
+    [Environment]::SetEnvironmentVariable("Path", $newPath, "Machine")
+    Write-Host "✅ Flutter bin path added to system PATH: $flutterBin"
 } else {
-    Write-Output "Flutter is already in PATH."
+    Write-Host "ℹ️ Flutter bin path already exists in system PATH."
 }
 
-# Refresh the current session environment (for current PowerShell only)
-$env:Path = [System.Environment]::GetEnvironmentVariable("Path", [System.EnvironmentVariableTarget]::Machine)
-
-# Run flutter doctor
-Write-Output "`nRunning flutter doctor..."
-& "$flutterBinPath\flutter.bat" doctor
+Write-Host "`n🎉 Setup Complete! You may need to restart your terminal or computer to apply changes."
