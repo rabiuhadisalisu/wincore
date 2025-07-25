@@ -1,7 +1,7 @@
 # Define variables
 $username = "rhsalisu"
 $fullname = "Rabiu Hadi Salisu"
-$password = "P@ssw0rd2024"
+$password = "R@b1u2004@"
 $securePassword = ConvertTo-SecureString -String $password -AsPlainText -Force
 
 # Create the user account
