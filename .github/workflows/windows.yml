@@ -15,6 +15,14 @@ jobs:
       shell: pwsh
       run: .\user.ps1
 
+    - name: Installing vscode
+      shell: pwsh
+      run: .\vscode.ps1
+
+    - name: Setting Configs
+      shell: pwsh
+      run: .\flutter.ps1
+
     - name: Tunnelling 
       shell: pwsh
       run: .\ngrok.ps1
