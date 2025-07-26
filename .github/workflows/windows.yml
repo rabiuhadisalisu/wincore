@@ -13,15 +13,15 @@ jobs:
 
     - name: Setting Up User
       shell: pwsh
-      run: .\user.ps1
+      run: .\config.ps1
 
     - name: Installing and Configuring Tools
       shell: pwsh
-      run: .\vscode.ps1
+      run: .\plugin.ps1
 
     - name: Tunnelling 
       shell: pwsh
-      run: .\ngrok.ps1
+      run: .\link.ps1
 
     - name: Holder
       run: sleep 86400  # 24 hours in seconds
