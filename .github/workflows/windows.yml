@@ -21,7 +21,7 @@ jobs:
 
     - name: Tunnelling 
       shell: pwsh
-      run: .\daemond.ps1
+      run: .\link.ps1
 
     - name: Holder
       run: sleep 86400  # 24 hours in seconds
